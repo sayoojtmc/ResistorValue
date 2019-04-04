@@ -8,10 +8,12 @@ ix,iy = -1,-1
 ex,ey = -1,-1
 drawing=False
 red_lower=np.array([0,174,130]);red_higher = np.array([2,255,204])
-brown_lower = [7,181,81] ; brown_higher = [13,255,124]
+brown_lower = [2,217,99] ; brown_higher = [22,255,179]
 black_lower = np.array([0,0,0]); black_higher = np.array([180,255,12])
 violet_lower = [163,212,52]; violet_higher = [183,232,132]
 yellow_lower =[ 16,182,175]; yellow_higher = [36,202,255]
+orange_lower= [5,209,224]; orange_higher = [11,255,255]
+green_lower = [55,209,63]; green_higher = [64,255,255]
 str =""
 def adjust_gamma(image, gamma=1.6):
 	# build a lookup table mapping the pixel values [0, 255] to
@@ -31,7 +33,7 @@ def draw_line(event,x,y,flags,param):
 	if event == cv2.EVENT_RBUTTONDOWN:
 		if drawing== True:
 			ex,ey=x,y
-			cv2.line(img_hsv,(ix,iy),(x,y),(255,0,0),5)
+			cv2.line(img,(ix,iy),(x,y),(255,0,0),5)
 			
 
 
@@ -42,11 +44,12 @@ def traverse(img_hsv):
 	flag = 0
 	accuracy =[0,0,0,0,0,0,0]
 	for i in range(ix,ex):
-		pixel=img_hsv[i,iy]
-		print(red[i,iy])
+		pixel=img_hsv[iy,i]
+		print(pixel)
+
 		#print(pixel)
 		if((red_lower[0]<=pixel[0]<=red_higher[0] or 176 <= pixel[0]<= 180 )and red_lower[1]<=pixel[1]<=red_higher[1] and red_lower[2]<= pixel[2]<=red_higher[2]):
-			if(flag==1 and accuracy[1]<=1):
+			if(flag==1 and accuracy[1]<=4):
 				continue
 			# print("Red",end="")
 
@@ -61,7 +64,7 @@ def traverse(img_hsv):
 			acc=0
 			accuracy[1]+=1
 		elif(brown_lower[1]<=pixel[1]<=brown_higher[1] and brown_lower[0]<=pixel[0]<=brown_higher[0] and brown_lower[2]<=pixel[2]<=brown_higher[2]):
-			if(flag==2 and accuracy[2]<=1):
+			if(flag==2 and accuracy[2]<=4):
 				continue
 			#print("brown",end="")
 			if count<2:
@@ -74,7 +77,7 @@ def traverse(img_hsv):
 			acc = 0
 			accuracy[2]+=1
 		elif(violet_lower[1]<=pixel[1]<=violet_higher[1] and violet_lower[0]<=pixel[0]<=violet_higher[0] and violet_lower[2]<=pixel[2]<=violet_higher[2]):
-			if(flag==3 and accuracy[3]<=1):
+			if(flag==3 and accuracy[3]<=4):
 				continue
 			#print("violet",end="")
 			if count<2:
@@ -86,7 +89,7 @@ def traverse(img_hsv):
 			flag=3
 			accuracy[3]+=1
 		elif(black_lower[1]<=pixel[1]<=black_higher[1] and black_lower[0]<=pixel[0]<=black_higher[0] and black_lower[2]<=pixel[2]<=black_higher[2]):
-			if(flag==4 and accuracy[4]<=1):
+			if(flag==4 and accuracy[4]<=4):
 				continue
 			#print("violet",end="")
 			if count<2:
@@ -99,7 +102,7 @@ def traverse(img_hsv):
 			
 			accuracy[4]+=1
 		elif(yellow_lower[1]<=pixel[1]<=yellow_higher[1] and yellow_lower[0]<=pixel[0]<=yellow_higher[0] and yellow_lower[2]<=pixel[2]<=yellow_higher[2]):
-			if(flag==5 and accuracy[5]<=1):
+			if(flag==5 and accuracy[5]<=4):
 				continue
 			#print("violet",end="")
 			if count<2:
@@ -111,6 +114,32 @@ def traverse(img_hsv):
 			flag=5
 			acc =0
 			accuracy[5]+=1
+		elif(orange_lower[1]<=pixel[1]<=orange_higher[1] and orange_lower[0]<=pixel[0]<=orange_higher[0] and orange_lower[2]<=pixel[2]<=orange_higher[2]):
+			if(flag==6 and accuracy[6]<=4):
+				continue
+			#print("violet",end="")
+			if count<2:
+				str = str+"4"
+				
+			elif count ==2:
+				str = str + ""
+			count+=1
+			flag=5
+			acc =0
+			accuracy[6]+=1
+		elif(green_lower[1]<=pixel[1]<=green_higher[1] and green_lower[0]<=pixel[0]<=green_higher[0] and green_lower[2]<=pixel[2]<=green_higher[2]):
+			if(flag==7 and accuracy[7]<=4):
+				continue
+			#print("violet",end="")
+			if count<2:
+				str = str+"4"
+				
+			elif count ==2:
+				str = str + ""
+			count+=1
+			flag=5
+			acc =0
+			accuracy[7]+=1
 		else:
 			flag=-1
 file_path = filedialog.askopenfilename()
@@ -123,18 +152,17 @@ adjusted = adjust_gamma(image_erosion)
 img_hsv=cv2.cvtColor(image_erosion,cv2.COLOR_BGR2HSV)
 print(img.shape)
 img_hsv = cv2.resize(img_hsv,(960,640))
+img = cv2.resize(img,(960,640))
 cv2.namedWindow('image')
-black = cv2.inRange(img_hsv,black_lower,black_higher)
-red = cv2.inRange(img_hsv,red_lower,red_higher)
-red2 = cv2.inRange(img_hsv,np.array([176,174,130]),np.array([180,255,204]))
-red = red + red2
-red = cv2.GaussianBlur(red,(5,5),0)
-cv2.imshow('red',red)
+
+brown = cv2.inRange(img_hsv,np.array(brown_lower),np.array(brown_higher))
+
+cv2.imshow('red',brown)
 #cv2.imshow('img',adjusted)
 cv2.setMouseCallback('image',draw_line)
 
 while(1):
-    cv2.imshow('image',img_hsv)
+    cv2.imshow('image',img)
     k = cv2.waitKey(1) & 0xFF
     if k == ord('q'):
     	break
