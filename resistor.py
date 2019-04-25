@@ -8,12 +8,12 @@ ix,iy = -1,-1
 ex,ey = -1,-1
 drawing=False
 red_lower=np.array([0,174,130]);red_higher = np.array([2,255,204])
-brown_lower = [2,217,99] ; brown_higher = [22,255,179]
+brown_lower = [0,245,63] ; brown_higher = [22,255,143]
 black_lower = np.array([0,0,0]); black_higher = np.array([180,255,12])
 violet_lower = [163,212,52]; violet_higher = [183,232,132]
 yellow_lower =[ 16,182,175]; yellow_higher = [36,202,255]
 orange_lower= [5,209,224]; orange_higher = [11,255,255]
-green_lower = [55,209,63]; green_higher = [64,255,255]
+green_lower = [39,171,126]; green_higher = [64,191,206]
 str =""
 def adjust_gamma(image, gamma=1.6):
 	# build a lookup table mapping the pixel values [0, 255] to
@@ -21,7 +21,7 @@ def adjust_gamma(image, gamma=1.6):
 	invGamma = 1.0 / gamma
 	table = np.array([((i / 255.0) ** invGamma) * 255
 		for i in np.arange(0, 256)]).astype("uint8")
- 
+
 	# apply gamma correction using the lookup table
 	return cv2.LUT(image, table)
 def draw_line(event,x,y,flags,param):
@@ -34,18 +34,17 @@ def draw_line(event,x,y,flags,param):
 		if drawing== True:
 			ex,ey=x,y
 			cv2.line(img,(ix,iy),(x,y),(255,0,0),5)
-			
+
 
 
 def traverse(img_hsv):
 	global str
-	print(ex,ey)
 	count = 0
 	flag = 0
-	accuracy =[0,0,0,0,0,0,0]
+	accuracy =[0,0,0,0,0,0,0,0]
 	for i in range(ix,ex):
 		pixel=img_hsv[iy,i]
-		print(pixel)
+		#print(pixel)
 
 		#print(pixel)
 		if((red_lower[0]<=pixel[0]<=red_higher[0] or 176 <= pixel[0]<= 180 )and red_lower[1]<=pixel[1]<=red_higher[1] and red_lower[2]<= pixel[2]<=red_higher[2]):
@@ -55,10 +54,10 @@ def traverse(img_hsv):
 
 			if count<2:
 				str = str+"2"
-				
+
 			elif count ==2:
 				str = str + "x100"
-				
+
 			count+=1
 			flag=1
 			acc=0
@@ -82,7 +81,7 @@ def traverse(img_hsv):
 			#print("violet",end="")
 			if count<2:
 				str = str+"7"
-				
+
 			elif count ==2:
 				str = str + "x10^7"
 			count+=1
@@ -94,12 +93,12 @@ def traverse(img_hsv):
 			#print("violet",end="")
 			if count<2:
 				str = str+"0"
-				
+
 			elif count ==2:
 				str = str + ""
 			count+=1
 			flag=4
-			
+
 			accuracy[4]+=1
 		elif(yellow_lower[1]<=pixel[1]<=yellow_higher[1] and yellow_lower[0]<=pixel[0]<=yellow_higher[0] and yellow_lower[2]<=pixel[2]<=yellow_higher[2]):
 			if(flag==5 and accuracy[5]<=4):
@@ -107,7 +106,7 @@ def traverse(img_hsv):
 			#print("violet",end="")
 			if count<2:
 				str = str+"4"
-				
+
 			elif count ==2:
 				str = str + ""
 			count+=1
@@ -119,8 +118,8 @@ def traverse(img_hsv):
 				continue
 			#print("violet",end="")
 			if count<2:
-				str = str+"4"
-				
+				str = str+"3"
+
 			elif count ==2:
 				str = str + ""
 			count+=1
@@ -132,8 +131,8 @@ def traverse(img_hsv):
 				continue
 			#print("violet",end="")
 			if count<2:
-				str = str+"4"
-				
+				str = str+"5"
+
 			elif count ==2:
 				str = str + ""
 			count+=1
@@ -150,14 +149,14 @@ kernel = np.ones((5,5), np.uint8)
 image_erosion = cv2.erode(img, kernel, iterations=1)
 adjusted = adjust_gamma(image_erosion)
 img_hsv=cv2.cvtColor(image_erosion,cv2.COLOR_BGR2HSV)
-print(img.shape)
+# print(img.shape)
 img_hsv = cv2.resize(img_hsv,(960,640))
 img = cv2.resize(img,(960,640))
 cv2.namedWindow('image')
 
-brown = cv2.inRange(img_hsv,np.array(brown_lower),np.array(brown_higher))
+#brown = cv2.inRange(img_hsv,np.array(green_lower),np.array(green_higher))
 
-cv2.imshow('red',brown)
+#cv2.imshow('red',brown)
 #cv2.imshow('img',adjusted)
 cv2.setMouseCallback('image',draw_line)
 
@@ -171,4 +170,4 @@ print(str)
 # plt.imshow(image_erosion)
 # plt.show()
 
-cv2.destroyAllWindows()       
+cv2.destroyAllWindows()
